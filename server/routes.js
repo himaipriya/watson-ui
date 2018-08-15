@@ -40,7 +40,6 @@ module.exports = (app, conversation) => {
             context: context,
             input: input || {}
         }
-        console.log(input)
         conversation.message(payload, (err, data) => {
             if (err) {
                 console.error(err);
