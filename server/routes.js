@@ -7,6 +7,8 @@
  */
 
 // context is updated for every request
+const request = require("request");
+
 var context = {};
 
 var CheckWorkspaceMiddleware = (req, res, next) => {
@@ -46,8 +48,36 @@ module.exports = (app, conversation) => {
                 return res.status(err.code || 500).json(err);
             }
             context = data.context;
-            res.json(data);
+            const { actions } = data
+            if (actions && actions.length > 0) {
+                getFXRate(actions[0].parameters.url).then(function (val) {
+                    data.output.text = [data.output.text[0].replace('{"cloud_functions_call_error":"The supplied authentication is invalid"}', '') + val.fxRate]
+                    res.json(data)
+                }).catch(function (err) {
+                    res.json({ output: { text: 'Please try again' } })
+                });
+            } else {
+                res.json(data);
+            }
+
         });
     });
 
+}
+
+
+function getFXRate(url) {
+    const options = {
+        url,
+        json: true
+    };
+    return new Promise(function (resolve, reject) {
+        request(options, function (err, resp) {
+            if (err) {
+                console.log(err);
+                return reject({ err: err });
+            }
+            return resolve({ fxRate: resp.body['Realtime Currency Exchange Rate']['5. Exchange Rate'] });
+        });
+    });
 }
