@@ -1,0 +1,10 @@
+<div ng-controller="LoginController as vm" class="chat-container d-flex flex-row justify-content-center align-items-lg-center">
+    <div class="wrapper">
+        <form class="form-signin">
+            <h2 class="form-signin-heading">Login</h2>
+            <input type="text" class="form-control" ng-model="vm.loginName" name="username" placeholder="Enter User Name" required=""
+                autofocus="" />
+            <button class="btn btn-lg btn-primary btn-block" ng-click="vm.login()" type="button">Login</button>
+        </form>
+    </div>
+</div>

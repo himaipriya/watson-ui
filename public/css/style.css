@@ -1,0 +1,111 @@
+
+html {
+    position: relative;
+    min-height: 100%;
+}
+
+body {
+    height: 100%;
+    margin-bottom: 45px;
+    background-color: #eee
+}
+
+#about-wrapper {
+    margin-top: 30px;
+}
+
+.effect {
+    -webkit-box-shadow: 0 0 3px rgb(100, 100, 100);
+    -moz-box-shadow: 0 0 3px rgb(100, 100, 100);
+}
+
+.center {
+    margin: 0 auto;
+    width: 50%;
+}
+
+.chat {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.chat li {
+    margin-bottom: 10px;
+    padding-bottom: 5px;
+    border-bottom: 1px dotted #999999;
+}
+
+.chat li.left .chat-body {
+    margin-left: 60px;
+}
+
+.chat li.right .chat-body {
+    margin-right: 60px;
+}
+
+.chat li .chat-body p {
+    margin: 0;
+}
+
+.chat-card {
+    padding: 0;
+}
+
+.chat-card .card-body {
+    min-height: 320px;
+    max-height: 320px;
+    overflow-y: scroll;
+}
+
+.card-footer {
+    padding: 0.75rem;
+}
+
+.chat-container {
+    min-height: calc(100vh - 102px);
+}
+
+.card-footer form .form-group {
+    margin-bottom: 0;
+}
+
+.footer {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    height: 40px;
+    background-color: #f2f2f2;
+}
+
+.footer-text {
+    text-align: center;
+    line-height: 40px;
+    height: 40px;
+}
+
+
+.wrapper {	
+	margin-top: 80px;
+  margin-bottom: 80px;
+}
+
+.form-signin {
+  max-width: 380px;
+  padding: 15px 35px 45px;
+  margin: 0 auto;
+  background-color: #fff;
+  border: 1px solid rgba(0,0,0,0.1);  
+}
+
+.form-signin input[type="text"] {
+	  margin: 10px 0;
+	  border-bottom-left-radius: 0;
+	  border-bottom-right-radius: 0;
+	}
+
+.form-signin input[type="password"] {
+	  margin-bottom: 20px;
+	  border-top-left-radius: 0;
+	  border-top-right-radius: 0;
+	}
