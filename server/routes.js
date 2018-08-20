@@ -1,15 +1,9 @@
-/*!
- * ./server/routes.js
- *
- * Declares the Express routes for the server
- * Authors: Abner Castro
- * Date: August 16th, 2017
- */
-
-// context is updated for every request
 const request = require("request");
-
-var context = {};
+const async = require("async")
+const getConversion = require('./conversionMessage')
+const getTone = require('./toneAnalyzer')
+const FEEL_GOOD = ['joy', 'analytical', 'confident', 'tentative']
+const FEEL_BAD = ['anger', 'fear', 'sadness']
 
 var CheckWorkspaceMiddleware = (req, res, next) => {
     var workspace = process.env.WORKSPACE_ID;
@@ -22,7 +16,6 @@ var CheckWorkspaceMiddleware = (req, res, next) => {
         });
     }
     else {
-        // Attach WorkspaceID to request object
         req.workspaceId = workspace;
         next();
     }
@@ -31,40 +24,65 @@ var CheckWorkspaceMiddleware = (req, res, next) => {
 module.exports = (app, conversation) => {
 
     app.post('/api/message', CheckWorkspaceMiddleware, (req, res) => {
-
-        let { content, recipient } = req.body.message;
-        let input = {
-            text: content,
-            userName: recipient
-        };
-        var payload = {
-            workspace_id: req.workspaceId,
-            context: context,
-            input: input || {}
-        }
-        conversation.message(payload, (err, data) => {
-            if (err) {
-                console.error(err);
-                return res.status(err.code || 500).json(err);
+        async.parallel({
+            conversion: function (callback) {
+                getConversion(conversation, req, callback)
+            },
+            tone: function (callback) {
+                getTone(req, callback)
             }
-            context = data.context;
+        }, function (err, results) {
+            if (err) {
+                res.status(err.code || 500).json(err);
+            }
+            const data = results.conversion
             const { actions } = data
-            if (actions && actions.length > 0) {
-                getFXRate(actions[0].parameters.url).then(function (val) {
-                    data.output.text = [data.output.text[0].replace('{"cloud_functions_call_error":"The supplied authentication is invalid"}', '') + val.fxRate]
-                    res.json(data)
-                }).catch(function (err) {
-                    res.json({ output: { text: 'Please try again' } })
-                });
+            if (getToneData(results.tone)) {
+                data.output.text = ['Sorry for the problem']
+                res.json(data);
+            } else if (actions && actions.length > 0) {
+                makeFXRate(actions, res, data)
             } else {
                 res.json(data);
             }
-
         });
     });
-
 }
 
+function getToneData(toneList) {
+    const { sentences_tone, document_tone } = toneList
+    return (checkIsSentencesBad(sentences_tone) || checkIsDocumentBad(document_tone))
+}
+
+function checkIsSentencesBad(toneCollection) {
+    let isCustomerBad = false
+    if (toneCollection && toneCollection.length > 0) {
+        toneCollection.forEach((tonesObj) => {
+            isCustomerBad = tonesObj.tones.find(function (tone) {
+                return FEEL_BAD.indexOf(tone.tone_id) > -1
+            }) ? true : false
+        })
+    }
+    return isCustomerBad
+}
+
+function checkIsDocumentBad(toneCollection) {
+    if (toneCollection.tones && toneCollection.tones.length > 0) {
+        return toneCollection.tones.find(function (tone) {
+            return FEEL_BAD.indexOf(tone.tone_id) > -1
+        }) ? true : false
+    }
+    return false
+}
+
+function makeFXRate(actions, res, data) {
+    getFXRate(actions[0].parameters.url).then(function (val) {
+        data.output.text = [data.output.text[0].replace('{"cloud_functions_call_error":"The supplied authentication is invalid"}', '') + val.fxRate]
+        res.json(data)
+    }).catch(function (err) {
+        res.json({ output: { text: 'Please try again' } })
+    });
+}
 
 function getFXRate(url) {
     const options = {
