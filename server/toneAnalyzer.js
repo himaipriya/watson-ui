@@ -1,8 +1,8 @@
 const ToneAnalyzerV3 = require('watson-developer-cloud/tone-analyzer/v3');
 
 const tone_analyzer = new ToneAnalyzerV3({
-    username: "7e56b457-e600-4c5f-96db-c74d3745de75",
-    password: "x1cA2wNcdJtg",
+    username: process.env.TONE_ANALYZER_USERNAME,
+    password: process.env.TONE_ANALYZER_PASSWORD,
     version_date: "2018-08-20"
 });
 
