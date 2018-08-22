@@ -40,7 +40,9 @@
                             var reply = {};
                             reply["recipient"] = "watson";
                             reply["content"] = data.output.text[0];
+                            reply["atm"] = data.output.atm ? data.output.atm : [];
                             reply["date"] = (new Date()).toTimeString().substr(0, 8);
+                            console.log(reply)
                             vm.messages.push(reply);
                         }
                     });

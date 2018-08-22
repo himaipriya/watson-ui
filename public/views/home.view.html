@@ -24,6 +24,7 @@
                         <p>
                             {{message.content}}
                         </p>
+
                     </div>
                 </li>
                 <li class="right clearfix" ng-if="message.recipient === 'watson'">
@@ -40,6 +41,16 @@
                         <p>
                             {{message.content}}
                         </p>
+                        <ul ng-repeat="objAtm in message.atm">
+                            <li>
+                                <div>{{objAtm.brandName}}</div>
+                                <ul>
+                                    <li ng-repeat="atmList in objAtm.atmList">
+                                        {{atmList.Location.Site.Name}}<br/>{{atmList.Location.PostalAddress.StreetName}}
+                                    </li>
+                                </ul>
+                            </li>
+                        </ul>
                     </div>
                 </li>
             </ul>

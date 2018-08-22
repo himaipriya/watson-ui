@@ -41,7 +41,11 @@ module.exports = (app, conversation) => {
                 data.output.text = ['Sorry for the problem']
                 res.json(data);
             } else if (actions && actions.length > 0) {
-                makeFXRate(actions, res, data)
+                if (actions[0].name === "/himaipriya@gmail.com_dev/ATM") {
+                    makeATMLocator(actions, res, data)
+                } else {
+                    makeFXRate(actions, res, data)
+                }
             } else {
                 res.json(data);
             }
@@ -73,6 +77,39 @@ function checkIsDocumentBad(toneCollection) {
         }) ? true : false
     }
     return false
+}
+
+function makeATMLocator(actions, res, data) {
+    getATMLocator(actions[0].parameters.url).then(function (val) {
+        console.log(val)
+        let atm = []
+        val.data[0].Brand.map(function (atmObj) {
+            let nAtm = {}
+            nAtm.brandName = atmObj.BrandName
+            nAtm.atmList = atmObj.ATM.slice(0, 5)
+            atm.push(nAtm)
+        })
+        data.output.atm = atm
+        res.json(data)
+    }).catch(function (err) {
+        res.json({ output: { text: 'Please try again' } })
+    });
+}
+
+function getATMLocator(url) {
+    const options = {
+        url,
+        json: true
+    };
+    return new Promise(function (resolve, reject) {
+        request(options, function (err, resp) {
+            if (err) {
+                console.log(err);
+                return reject({ err: err });
+            }
+            return resolve(resp.body);
+        });
+    });
 }
 
 function makeFXRate(actions, res, data) {
